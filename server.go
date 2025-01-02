@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"github.com/gin-gonic/gin"
 	"strings"
+	"github.com/gin-gonic/gin"
 )
 
 // check if path exists
@@ -59,10 +59,15 @@ func get_dir_list(path string) (string, error) {
 	return list, nil
 }
 func main() {
-	os.Setenv("PUBDIR", "M:/Libraries/Dev/fs.alacriware/public")
+	// os.Setenv("PUBDIR", "./public")
 	public_path := os.Getenv("PUBDIR")
+	if public_path == "" {
+		fmt.Println("No value found for PUBDIR.")
+		os.Exit(1)
+	}
     // initialize router
 	r := gin.Default()
+	r.SetTrustedProxies(nil)
 	r.NoRoute(func(c *gin.Context) {
 		full_path := filepath.Join(public_path, c.Request.URL.String())
 		if path_exists(full_path) {
