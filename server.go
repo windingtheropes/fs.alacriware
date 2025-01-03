@@ -73,6 +73,8 @@ func main() {
 	r := gin.Default()
 	r.Use(auth.Auth())
 	r.SetTrustedProxies(nil)
+
+	// all paths are registered and checked as routes
 	r.NoRoute(func(c *gin.Context) {
 		full_path := filepath.Join(public_path, c.Request.URL.String())
 		if path_exists(full_path) {

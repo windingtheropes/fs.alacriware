@@ -22,7 +22,7 @@ CREATE TABLE token (
 CREATE TABLE permissions (
     id      INT AUTO_INCREMENT NOT NULL,
     resource_path    VARCHAR(256) NOT NULL,
-    view    BOOLEAN NOT NULL,
+    allowed    BOOLEAN NOT NULL,
     apply_recursive BOOLEAN NOT NULL,
     PRIMARY KEY (`id`)
 );
