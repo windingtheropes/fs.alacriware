@@ -25,11 +25,12 @@ type token struct {
 	max     int16
 	used    int16
 }
-type permissions struct {
+type Permissions struct {
 	ID              int64
-	resource_path   string
-	allowed         bool
-	apply_recursive bool
+	// UID 			int NEED A WAY TO IDENTIFY BOTH GROUPS AND USERS 
+	Resource_Path   string
+	Allowed         bool
+	Apply_Recursive bool
 }
 type Request_Log struct {
 	IP            string
