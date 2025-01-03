@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/windingtheropes/fs.alacriware/auth"
 )
 
 // check if path exists
@@ -25,6 +26,7 @@ func is_file(path string) bool {
 	}
 	return !info.IsDir()
 }
+
 func safe_path(path string) string {
 	// Windows is dumb
 	path = strings.ReplaceAll(path, "\\", "/")
@@ -69,6 +71,7 @@ func main() {
 	}
 	// initialize router
 	r := gin.Default()
+	r.Use(auth.Auth())
 	r.SetTrustedProxies(nil)
 	r.NoRoute(func(c *gin.Context) {
 		full_path := filepath.Join(public_path, c.Request.URL.String())
