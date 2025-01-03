@@ -6,8 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/gin-gonic/gin"
 	"github.com/windingtheropes/fs.alacriware/auth"
+	"github.com/windingtheropes/fs.alacriware/based"
+	"github.com/windingtheropes/fs.alacriware/logger"
 )
 
 // check if path exists
@@ -71,12 +74,23 @@ func main() {
 	}
 	// initialize router
 	r := gin.Default()
+
+	config := mysql.Config{
+		User:   os.Getenv("DBUSER"),
+		Passwd: os.Getenv("DBPASS"),
+		Net:    "tcp",
+		Addr:   fmt.Sprintf("%s:%s", os.Getenv("DBHOST"), os.Getenv("DBPORT")),
+		DBName: os.Getenv("DBNAME"),
+	}
+	based.InitDB(config)
+	
 	r.Use(auth.Auth())
+	r.Use(logger.LogRequest())
 	r.SetTrustedProxies(nil)
 
 	// all paths are registered and checked as routes
 	r.NoRoute(func(c *gin.Context) {
-		full_path := filepath.Join(public_path, c.Request.URL.String())
+		full_path := filepath.Join(public_path, c.Request.URL.Path)
 		if path_exists(full_path) {
 			if is_file(full_path) {
 				// Is file
