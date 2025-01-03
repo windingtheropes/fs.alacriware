@@ -5,14 +5,16 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
 	"github.com/gin-gonic/gin"
 )
 
 // check if path exists
 func path_exists(path string) bool {
-	_, err := os.Stat(path);
+	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
 }
+
 // check is path a file
 func is_file(path string) bool {
 	info, err := os.Stat(path)
@@ -43,8 +45,8 @@ func get_dir_list(path string) (string, error) {
 		fmt.Println("Error while gen dir path " + path + ":" + err.Error())
 		return "", err
 	}
-	
-	files, err := os.ReadDir(path);
+
+	files, err := os.ReadDir(path)
 	if err != nil {
 		fmt.Println("Error while gen dir path " + path + ":" + err.Error())
 		return "", err
@@ -53,7 +55,7 @@ func get_dir_list(path string) (string, error) {
 	if len(files) > 250 {
 		return fmt.Sprintf("Too many files (%v)", len(files)), nil
 	}
-	for i := 0; i<len(files); i++ {
+	for i := 0; i < len(files); i++ {
 		list = list + "\n" + safe_path(filepath.Join(path, files[i].Name()))
 	}
 	return list, nil
@@ -65,7 +67,7 @@ func main() {
 		fmt.Println("No value found for PUBDIR.")
 		os.Exit(1)
 	}
-    // initialize router
+	// initialize router
 	r := gin.Default()
 	r.SetTrustedProxies(nil)
 	r.NoRoute(func(c *gin.Context) {
@@ -88,5 +90,5 @@ func main() {
 		}
 		c.Status(404)
 	})
-	r.Run(":3030");
+	r.Run(":3030")
 }
