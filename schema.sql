@@ -30,8 +30,9 @@ CREATE TABLE permissions (
 CREATE TABLE requests (
     id      INT AUTO_INCREMENT NOT NULL,
     ip      VARCHAR(12) NOT NULL,
-    access_time    INT NOT NULL,
+    access_time     BIGINT NOT NULL,
     resource_path    VARCHAR(256) NOT NULL,
     token   VARCHAR(64) NOT NULL, 
+    code INT NOT NULL,
     PRIMARY KEY (`id`)
 );
