@@ -1,12 +1,12 @@
-CREATE TABLE grp (
+CREATE TABLE usr (
     id         INT AUTO_INCREMENT NOT NULL,
-    name       VARCHAR(64),
+    usr_name       VARCHAR(64),
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE usr (
-    id      INT AUTO_INCREMENT NOT NULL,
-    name    VARCHAR(64),
+CREATE TABLE grp (
+    id         INT AUTO_INCREMENT NOT NULL,
+    grp_name       VARCHAR(64),
     PRIMARY KEY (`id`)
 );
 
@@ -22,6 +22,8 @@ CREATE TABLE token (
 CREATE TABLE permissions (
     id      INT AUTO_INCREMENT NOT NULL,
     resource_path    VARCHAR(256) NOT NULL,
+    group_id         INT NOT NULL,
+    user_id         INT NOT NULL,
     allowed    BOOLEAN NOT NULL,
     apply_recursive BOOLEAN NOT NULL,
     PRIMARY KEY (`id`)
