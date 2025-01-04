@@ -18,7 +18,7 @@ func LogRequest() gin.HandlerFunc {
 			req := based.Request_Log {
 				IP: c.ClientIP(),
 				Access_Time: time.Now().UnixMilli(),
-				Resource_Path: c.Request.RequestURI,
+				Resource_Path: c.Request.URL.Path,
 				Token: c.Query("t"),
 				Code: c.Writer.Status(),
 			}
