@@ -10,24 +10,25 @@ import (
 
 var DB Database
 
-type grp struct {
-	ID   int64
-	name string
+type Grp struct {
+	ID   int
+	Name string
 }
-type usr struct {
-	ID   int64
-	name string
+type Usr struct {
+	ID   int
+	Name string
 }
-type token struct {
-	ID      int64
-	user_ID int64
-	expiry  int64
-	max     int16
-	used    int16
+type Token struct {
+	ID      string
+	User_ID int
+	Expiry  int64 //milli
+	Max     int16
+	Used    int16
 }
 type Permissions struct {
 	ID              int64
-	// UID 			int NEED A WAY TO IDENTIFY BOTH GROUPS AND USERS 
+	User_ID         int
+	Group_ID        int
 	Resource_Path   string
 	Allowed         bool
 	Apply_Recursive bool
@@ -37,7 +38,7 @@ type Request_Log struct {
 	Access_Time   int64
 	Resource_Path string
 	Token         string
-	Code		  int
+	Code          int
 }
 
 func InitDB(config mysql.Config) {
@@ -66,29 +67,30 @@ func (d *Database) Hi() {
 	fmt.Println("i'm based!")
 }
 
-// // albumsByArtist queries for albums that have the specified artist name.
-// func (d *Database) albumsByArtist(name string) ([]Album, error) {
-//     // An albums slice to hold data from returned rows.
-//     var albums []Album
+// find a token
+func (d *Database) FindToken(t string) ([]Token, error) {
+	// A tokens slice to hold data from returned rows.
+	var tokens []Token
 
-//     rows, err := db.Query("SELECT * FROM album WHERE artist = ?", name)
-//     if err != nil {
-//         return nil, fmt.Errorf("albumsByArtist %q: %v", name, err)
-//     }
-//     defer rows.Close()
-//     // Loop through rows, using Scan to assign column data to struct fields.
-//     for rows.Next() {
-//         var alb Album
-//         if err := rows.Scan(&alb.ID, &alb.Title, &alb.Artist, &alb.Price); err != nil {
-//             return nil, fmt.Errorf("albumsByArtist %q: %v", name, err)
-//         }
-//         albums = append(albums, alb)
-//     }
-//     if err := rows.Err(); err != nil {
-//         return nil, fmt.Errorf("albumsByArtist %q: %v", name, err)
-//     }
-//     return albums, nil
-// }
+	rows, err := d.db.Query("SELECT * FROM token WHERE id = ?", t)
+	if err != nil {
+		return nil, fmt.Errorf("find token %q: %v", t, err)
+	}
+	defer rows.Close()
+	
+	// Loop through rows, using Scan to assign column data to struct fields.
+	for rows.Next() {
+		var tok Token
+		if err := rows.Scan(&tok.ID, &tok.User_ID, &tok.Expiry, &tok.Max, &tok.Used); err != nil {
+			return nil, fmt.Errorf("token %q: %v", t, err)
+		}
+		tokens = append(tokens, tok)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("get tokens %q: %v", t, err)
+	}
+	return tokens, nil
+}
 
 func (d *Database) LogRequest(request Request_Log) (int64, error) {
 	result, err := d.db.Exec("INSERT INTO requests (ip, access_time, resource_path, token, code) VALUES (?, ?, ?, ?, ?)", request.IP, request.Access_Time, request.Resource_Path, request.Token, request.Code)
@@ -101,3 +103,39 @@ func (d *Database) LogRequest(request Request_Log) (int64, error) {
 	}
 	return id, nil
 }
+
+func (d *Database) AddUser(usr Usr) (int64, error) {
+	result, err := d.db.Exec("INSERT INTO usr (usr_name) VALUES (?)", usr.Name)
+	if err != nil {
+		return 0, fmt.Errorf("add user: %v", err)
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("add user: %v", err)
+	}
+	return id, nil
+}
+
+func (d *Database) AddGrp(grp Grp) (int64, error) {
+	result, err := d.db.Exec("INSERT INTO grp (grp_name) VALUES (?)", grp.Name)
+	if err != nil {
+		return 0, fmt.Errorf("add grp: %v", err)
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("add grp: %v", err)
+	}
+	return id, nil
+}
+
+// func (d *Database) AddToken(tok Token) (int64, error) {
+// 	result, err := d.db.Exec("INSERT INTO grp (id, user_id, expiry, max, used) VALUES (?)", grp.Name)
+// 	if err != nil {
+// 		return 0, fmt.Errorf("add grp: %v", err)
+// 	}
+// 	id, err := result.LastInsertId()
+// 	if err != nil {
+// 		return 0, fmt.Errorf("add grp: %v", err)
+// 	}
+// 	return id, nil
+// }
