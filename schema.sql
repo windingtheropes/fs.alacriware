@@ -19,18 +19,9 @@ CREATE TABLE token (
     FOREIGN KEY (user_id) REFERENCES usr(id)
 );
 
-CREATE TABLE permissions (
+CREATE TABLE request (
     id      INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    resource_path    VARCHAR(256) NOT NULL,
-    group_id         INT NOT NULL,
-    allowed    BOOLEAN NOT NULL,
-    apply_recursive BOOLEAN NOT NULL,
-    FOREIGN KEY (group_id) REFERENCES grp(id)
-);
-
-CREATE TABLE requests (
-    id      INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
-    ip      VARCHAR(12) NOT NULL,
+    ip      VARCHAR(64) NOT NULL,
     access_time     BIGINT NOT NULL,
     resource_path    VARCHAR(256) NOT NULL,
     token   VARCHAR(64) NOT NULL, 
@@ -44,4 +35,14 @@ CREATE TABLE membership (
     FOREIGN KEY (user_id) REFERENCES usr(id),
     FOREIGN KEY (group_id) REFERENCES grp(id)
 );
+
 INSERT INTO membership (user_id, group_id) VALUES (1,1);
+
+CREATE TABLE permissions (
+    id      INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    resource_path    VARCHAR(256) NOT NULL,
+    group_id         INT NOT NULL,
+    allowed    BOOLEAN NOT NULL,
+    apply_recursive BOOLEAN NOT NULL,
+    FOREIGN KEY (group_id) REFERENCES grp(id)
+);
