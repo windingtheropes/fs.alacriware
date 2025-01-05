@@ -50,7 +50,7 @@ func getCredentials(tQuery string) Credentials {
 				token.Used += 1
 				_, err := webdb.WDB.UpdateToken(token)
 				if err != nil {
-					fmt.Println("Token update error: %v", err)
+					fmt.Printf("Token update error: %v", err)
 					return Credentials {
 						UID: 1,
 					}
@@ -77,19 +77,24 @@ func IsInPathScope(path string, scope string) bool {
 	if path != "/" { 
 		path, _ = strings.CutSuffix(path, "/") 
 	}
-
-	// /hello/ , ensure terminating slash always
 	if scope != "/" { 
 		scope, _ = strings.CutSuffix(scope, "/") 
-		scope = scope + "/"
 	}
-
+	
 	if strings.Count(path, "/") > strings.Count(scope, "/") {
 		// The path is deeper than scope but not neccesarily within
 		
 		// Confirm most cases using the replace and add method, confirm by ensuring that the replaced portion was at the front of the path
-		relative_path := strings.Replace(path, scope, "", 1)
-		if len(relative_path) + len(scope) == len(path) && strings.HasPrefix(path, scope) == true {
+		scope_explicit := func () string {
+			if scope == "/" {
+				return scope
+			} else {
+				return scope + "/"
+			}
+		}()
+		
+		relative_path := strings.Replace(path, scope_explicit, "", 1)
+		if len(relative_path) + len(scope_explicit) == len(path) && strings.HasPrefix(path, scope) == true {
 			return true
 		}
 	} else if scope == "/" {
@@ -109,7 +114,7 @@ func canAccessResource(resource string, groups []int) bool {
 			gid := groups[i]
 			permissions, err := webdb.WDB.GetPermissions(gid)
 			if err != nil {
-				fmt.Println("Error getting group permissions: %v", err)
+				fmt.Printf("Error getting group permissions: %v", err)
 			}
 
 			for p := range permissions {
@@ -136,7 +141,7 @@ func Auth() gin.HandlerFunc {
 		credentials := getCredentials(c.Query("t"))
 		groups, err := webdb.WDB.GetUserMembership(credentials.UID)
 		if err != nil {
-			fmt.Println("Error getting user membership: %v", err)
+			fmt.Printf("Error getting user membership: %v", err)
 		}
 		if canAccessResource(c.Request.URL.Path, groups) == false {
 			c.AbortWithStatus(403)
