@@ -7,12 +7,8 @@ import (
 	"strings"
 	"time"
 
-	// "fmt"
-
-	// "fmt"
-
 	"github.com/gin-gonic/gin"
-	"github.com/windingtheropes/fs.alacriware/based"
+	"github.com/windingtheropes/fs.alacriware/based/webdb"
 )
 type Credentials struct {
 	UID int
@@ -28,7 +24,7 @@ func NewToken(uid int, expiry int, max_uses int) string {
 	return base64.URLEncoding.EncodeToString(randomBytes)[:TOKEN_LENGTH]
 }
 func getCredentials(tQuery string) Credentials {
-		res, err := based.DB.FindToken(tQuery)
+		res, err := webdb.WDB.FindToken(tQuery)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -52,7 +48,7 @@ func getCredentials(tQuery string) Credentials {
 			// Take stats on unlimited tokens
 			if (token.Used <= token.Max) || token.Max == 0 {
 				token.Used += 1
-				_, err := based.DB.UpdateToken(token)
+				_, err := webdb.WDB.UpdateToken(token)
 				if err != nil {
 					fmt.Println("Token update error: %v", err)
 					return Credentials {
@@ -111,7 +107,7 @@ func canAccessResource(resource string, groups []int) bool {
 	} else {
 		for i := range groups {
 			gid := groups[i]
-			permissions, err := based.DB.GetPermissions(gid)
+			permissions, err := webdb.WDB.GetPermissions(gid)
 			if err != nil {
 				fmt.Println("Error getting group permissions: %v", err)
 			}
@@ -138,7 +134,7 @@ func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {		
 		// if permitted
 		credentials := getCredentials(c.Query("t"))
-		groups, err := based.DB.GetUserMembership(credentials.UID)
+		groups, err := webdb.WDB.GetUserMembership(credentials.UID)
 		if err != nil {
 			fmt.Println("Error getting user membership: %v", err)
 		}

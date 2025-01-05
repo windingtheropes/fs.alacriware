@@ -6,10 +6,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/gin-gonic/gin"
+	"github.com/go-sql-driver/mysql"
 	"github.com/windingtheropes/fs.alacriware/auth"
 	"github.com/windingtheropes/fs.alacriware/based"
+	"github.com/windingtheropes/fs.alacriware/based/webdb"
 	"github.com/windingtheropes/fs.alacriware/logger"
 )
 
@@ -85,7 +86,8 @@ func file_server() {
 		Addr:   fmt.Sprintf("%s:%s", os.Getenv("DBHOST"), os.Getenv("DBPORT")),
 		DBName: os.Getenv("DBNAME"),
 	}
-	based.InitDB(config)
+
+	webdb.Init(based.ConectDB(config))
 	
 	r.Use(auth.Auth())
 	r.Use(logger.LogRequest())
