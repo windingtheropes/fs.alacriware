@@ -13,7 +13,7 @@ INSERT INTO grp (grp_name) VALUES ("Default");
 CREATE TABLE token (
     id      VARCHAR(64) NOT NULL PRIMARY KEY,
     user_id INT NOT NULL,
-    expiry  INT NOT NULL,
+    expiry  BIGINT NOT NULL,
     max   INT NOT NULL,
     used    INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES usr(id)

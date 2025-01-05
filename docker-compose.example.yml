@@ -1,7 +1,4 @@
 services:
-  mysql:
-    image: container-registry.oracle.com/mysql/community-server
-    
   app:
     image: fs.alacriware
     name: fs.alacriware

@@ -1,0 +1,3 @@
+check for trailing slash (/) in IsInPathScope
+different behaviour for exact path '/' in IsInPathScope
+based modify token / auth token uses
