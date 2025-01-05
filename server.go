@@ -69,7 +69,7 @@ func get_dir_list(path string) (string, error) {
 	}
 	for i := 0; i < len(files); i++ {
 		rel_path := safe_path(filepath.Join(path, files[i].Name()))
-		list = list + "\n" + fmt.Sprintf("<a href='%v'>%v</>",rel_path,rel_path)
+		list = list + "<br>" + fmt.Sprintf("<a href='%v'>%v</>",rel_path,rel_path)
 	}
 	return list, nil
 }
