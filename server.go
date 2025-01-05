@@ -66,7 +66,6 @@ func get_dir_list(path string) (string, error) {
 	return list, nil
 }
 func main() {
-	// os.Setenv("PUBDIR", "./public")
 	public_path := os.Getenv("PUBDIR")
 	if public_path == "" {
 		fmt.Println("No value found for PUBDIR.")
