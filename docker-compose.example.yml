@@ -1,0 +1,23 @@
+services:
+  mysql:
+    image: container-registry.oracle.com/mysql/community-server
+    
+  app:
+    image: fs.alacriware
+    name: fs.alacriware
+    restart: always
+    ports:
+      - 3030:3030
+    volumes:
+      - type: bind
+        source: /path/on/host
+        # /public is the directory, within the container, that will be served.
+        target: /public 
+    environment:
+      # Variables for database configuration
+      DBNAME: "fs_alacriware" 
+      DBHOST: "localhost" 
+      DBPORT: "3306" 
+      DBUSER: "user" 
+      DBPASS: "pass"
+  
