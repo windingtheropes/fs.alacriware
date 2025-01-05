@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"strings"
 	"time"
 
 	// "fmt"
@@ -15,7 +16,6 @@ import (
 )
 type Credentials struct {
 	UID int
-	Token string
 }
 const TOKEN_LENGTH  = 64
 
@@ -58,16 +58,69 @@ func getCredentials(tQuery string) Credentials {
 			}
 		}
 }
+
+// Check if path is within scope
+func IsInPathScope(path string, scope string) bool {
+	if strings.Count(path, "/") > strings.Count(scope, "/") {
+		// The path is deeper than scope but not neccesarily within
+		scope_dir := scope + "/"
+		relative_path := strings.Replace(path, scope_dir, "", 1)
+		if len(relative_path) + len(scope_dir) == len(path) {
+			return true
+		}
+	}
+	return false
+}
+
+// Whitelist basis; block by default
+func canAccessResource(resource string, groups []int) bool {
+	allowed := false
+	if len(groups) == 0 {
+		// User doesn't have any permissions
+		return false
+	} else {
+		for i := range groups {
+			gid := groups[i]
+			permissions, err := based.DB.GetPermissions(gid)
+			if err != nil {
+				fmt.Println("Error getting group permissions: %v", err)
+			}
+
+			for p := range permissions {
+				perm := permissions[p]
+				fmt.Println(perm)
+				if (perm.Apply_Recursive == true && IsInPathScope(resource, perm.Resource_Path)) || perm.Resource_Path == resource {
+					if perm.Allowed == true { 
+						// Soft alow
+						allowed = true
+						continue 
+					} else { 
+						// Hard deny
+						return false 
+					}
+				} 
+			}
+		}
+	}
+	return allowed
+}
+// Authenticates on a whitelist basis, where all unauthenticated users are tried as User 1
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {		
 		// if permitted
-		c.Next()
 		credentials := getCredentials(c.Query("t"))
-		fmt.Println(credentials)
-		// else
-		// c.Status(403)
-		// c.Abort()
-
+		groups, err := based.DB.GetUserMembership(credentials.UID)
+		fmt.Println(c.Request.URL.Path)
+		if err != nil {
+			fmt.Println("Error getting user membership: %v", err)
+		}
+		if canAccessResource(c.Request.URL.Path, groups) == false {
+			c.AbortWithStatus(403)
+			return
+		} else {
+			c.Next()
+		}
 	}
 }
+
 
