@@ -1,1 +1,1 @@
-sudo docker buildx create --use && sudo docker buildx build --platform linux/amd64,linux/arm64 -t windingtherope/fs-alacriware:auth --push .
+ source ARGS; docker buildx build --platform $PLATS -t $TAG . --push 
