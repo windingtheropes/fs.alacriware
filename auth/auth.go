@@ -63,7 +63,19 @@ func getCredentials(tQuery string) Credentials {
 func IsInPathScope(path string, scope string) bool {
 	if strings.Count(path, "/") > strings.Count(scope, "/") {
 		// The path is deeper than scope but not neccesarily within
-		scope_dir := scope + "/"
+		scope_dir := func() string {
+			// If root, root is a folder
+			if(scope == "/") {
+				return "/"
+			// /hello becomes /hello/ explicit directory notation, if not already
+			} else {
+				if(strings.HasSuffix(scope, "/")) {
+					return scope
+				} else {
+					return scope + "/"
+				}
+			}
+		}()
 		relative_path := strings.Replace(path, scope_dir, "", 1)
 		if len(relative_path) + len(scope_dir) == len(path) {
 			return true
