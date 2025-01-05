@@ -40,18 +40,34 @@ func getCredentials(tQuery string) Credentials {
 		} else {
 			// Token exists, make sure it is valid before authing as the user contained
 			token := res[0]
-			if(token.Used > token.Max) {
-				// Token is invalid due to max uses
-				return Credentials{
-					UID: 1,
-				}
-			}
 			if(time.Now().UnixMilli() > token.Expiry) {
 				// Token is invalid due to ttl
 				return Credentials{
 					UID: 1,
 				}
 			}
+
+			// Increment uses on the token, and save to database
+			// Only increment if within the limits, don't increment over
+			// Take stats on unlimited tokens
+			if (token.Used <= token.Max) || token.Max == 0 {
+				token.Used += 1
+				_, err := based.DB.UpdateToken(token)
+				if err != nil {
+					fmt.Println("Token update error: %v", err)
+					return Credentials {
+						UID: 1,
+					}
+				}
+			}
+			
+			// Token.Max == 0 means unlimited use
+			if(token.Used > token.Max) && token.Max != 0 {
+				// Token is invalid due to max uses
+				return Credentials{
+					UID: 1,
+				}
+			} 
 			// The token is valid, so the user is acceptable
 			return Credentials{
 				UID: token.User_ID,
@@ -61,25 +77,27 @@ func getCredentials(tQuery string) Credentials {
 
 // Check if path is within scope
 func IsInPathScope(path string, scope string) bool {
+	// /hello , ensure never terminating slash
+	if path != "/" { 
+		path, _ = strings.CutSuffix(path, "/") 
+	}
+
+	// /hello/ , ensure terminating slash always
+	if scope != "/" { 
+		scope, _ = strings.CutSuffix(scope, "/") 
+		scope = scope + "/"
+	}
+
 	if strings.Count(path, "/") > strings.Count(scope, "/") {
 		// The path is deeper than scope but not neccesarily within
-		scope_dir := func() string {
-			// If root, root is a folder
-			if(scope == "/") {
-				return "/"
-			// /hello becomes /hello/ explicit directory notation, if not already
-			} else {
-				if(strings.HasSuffix(scope, "/")) {
-					return scope
-				} else {
-					return scope + "/"
-				}
-			}
-		}()
-		relative_path := strings.Replace(path, scope_dir, "", 1)
-		if len(relative_path) + len(scope_dir) == len(path) {
+		
+		// Confirm most cases using the replace and add method, confirm by ensuring that the replaced portion was at the front of the path
+		relative_path := strings.Replace(path, scope, "", 1)
+		if len(relative_path) + len(scope) == len(path) && strings.HasPrefix(path, scope) == true {
 			return true
 		}
+	} else if scope == "/" {
+		return true
 	}
 	return false
 }
