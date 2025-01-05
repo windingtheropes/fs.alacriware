@@ -191,6 +191,18 @@ func (d *Database) LogRequest(request Request_Log) (int64, error) {
 	return id, nil
 }
 
+func (d *Database) UpdateToken(token Token) (int64, error) {
+	result, err := d.db.Exec("UPDATE token SET user_id = ?, expiry = ?, max = ?, used = ? WHERE id = ?", token.User_ID, token.Expiry, token.Max, token.Used, token.ID)
+	if err != nil {
+		return 0, fmt.Errorf("update token: %v", err)
+	}
+	rowsUpdated, err := result.RowsAffected()
+	if err != nil {
+		return 0, fmt.Errorf("update token: %v", err)
+	}
+	return rowsUpdated, nil
+}
+
 // func (d *Database) AddUser(usr Usr) (int64, error) {
 // 	result, err := d.db.Exec("INSERT INTO usr (usr_name) VALUES (?)", usr.Name)
 // 	if err != nil {
