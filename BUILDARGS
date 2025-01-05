@@ -1,0 +1,2 @@
+TAG=windingtherope/fs-alacriware:auth
+BUILD_PLATFORMS=linux/arm64,linux/amd64
