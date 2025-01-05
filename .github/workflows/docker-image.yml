@@ -17,4 +17,4 @@ jobs:
     - name: prepare buildx
       run: docker buildx create --use
     - name: build docker image
-      run: sh dockerbuild.sh
+      run: source BUILDARGS; sh dockerbuild.sh
