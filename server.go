@@ -34,7 +34,12 @@ func is_file(path string) bool {
 func safe_path(path string) string {
 	// Windows is dumb
 	path = strings.ReplaceAll(path, "\\", "/")
-	return strings.Replace(path, os.Getenv("PUBDIR"), "", -1)
+	cleaned_path := strings.Replace(path, os.Getenv("PUBDIR"), "", 1)
+	if cleaned_path == "" {
+		return "/"
+	} else {
+		return cleaned_path
+	}
 }
 func get_dir_list(path string) (string, error) {
 	info, err := os.Stat(path)
@@ -57,12 +62,14 @@ func get_dir_list(path string) (string, error) {
 		fmt.Println("Error while gen dir path " + path + ":" + err.Error())
 		return "", err
 	}
-	var list string = safe_path(path)
+
+	var list string = fmt.Sprintf("<h1>%v</h1>",safe_path(path))
 	if len(files) > 250 {
 		return fmt.Sprintf("Too many files (%v)", len(files)), nil
 	}
 	for i := 0; i < len(files); i++ {
-		list = list + "\n" + safe_path(filepath.Join(path, files[i].Name()))
+		rel_path := safe_path(filepath.Join(path, files[i].Name()))
+		list = list + "\n" + fmt.Sprintf("<a href='%v'>%v</>",rel_path,rel_path)
 	}
 	return list, nil
 }
@@ -108,7 +115,7 @@ func file_server() {
 					c.Status(500)
 					return
 				}
-				c.String(200, list)
+				c.Data(200, "text/html; charset=utf-8", []byte(list))
 				return
 			}
 		}
