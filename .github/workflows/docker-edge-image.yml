@@ -20,4 +20,4 @@ jobs:
     - name: login
       run: echo $PASSWORD | docker login -u $USERNAME --password-stdin
     - name: build docker image
-      run: docker buildx build --platform linux/amd64,linux/arm64 --tag windingtherope/fs-alacriware:latest --push . 
+      run: docker buildx build --platform linux/amd64,linux/arm64 --tag windingtherope/fs-alacriware:edge --push . 
