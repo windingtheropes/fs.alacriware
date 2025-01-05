@@ -9,7 +9,7 @@ env:
   PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
 jobs:
   build:
-    environment: actions
+    environment: deployment
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
