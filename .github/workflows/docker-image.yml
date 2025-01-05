@@ -7,17 +7,17 @@ on:
     branches: [ "main" ]
 env:
   # Setting an environment variable with the value of a configuration variable
-  username: ${{ vars.ENV_CONTEXT_VAR }} 
-  password: ${{ secrets.DOCKERHUB_TOKEN }}
+  USERNAME: ${{ vars.DOCKERHUB_USERNAME }} 
+  PASSWORD: ${{ secrets.DOCKERHUB_TOKEN }}
 jobs:
-  
   build:
+    environment: actions
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: prepare buildx
       run: docker buildx create --use
     - name: login
-      run: echo $password | docker login --username $username --password-stdin
+      run: echo $PASSWORD | docker login -u $USERNAME --password-stdin
     - name: build docker image
-      run: docker buildx build --platform linux/amd64,linux/arm64 --tag windingtherope/fs-alacriware:gh --push . 
+      run: docker buildx build --platform linux/amd64,linux/arm64 --tag windingtherope/fs-alacriware:latest --push . 
