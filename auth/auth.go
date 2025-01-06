@@ -49,7 +49,8 @@ func getCredentials(tQuery string) Credentials {
 		} else {
 			// Token exists, make sure it is valid before authing as the user contained
 			token := res[0]
-			if(time.Now().UnixMilli() > token.Expiry) {
+			// Check if the token is still alive, 0 means it won't expire
+			if(time.Now().UnixMilli() > token.Expiry) && token.Expiry != 0 {
 				// Token is invalid due to ttl
 				return Credentials{
 					UID: 1,
@@ -58,7 +59,7 @@ func getCredentials(tQuery string) Credentials {
 
 			// Increment uses on the token, and save to database
 			// Only increment if within the limits, don't increment over
-			// Take stats on unlimited tokens
+			// Take stats on unlimited tokens (when max is 0)
 			if (token.Used <= token.Max) || token.Max == 0 {
 				token.Used += 1
 				_, err := webdb.WDB.UpdateToken(token)
