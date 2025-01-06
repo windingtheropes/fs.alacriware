@@ -2,12 +2,9 @@ package main
 
 import (
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
