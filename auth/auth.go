@@ -15,7 +15,7 @@ type Credentials struct {
 }
 const TOKEN_LENGTH  = 64
 
-func NewToken(uid int, expiry int, max_uses int) string {
+func genToken() string {
 	randomBytes := make([]byte, TOKEN_LENGTH)
     _, err := rand.Read(randomBytes)
     if err != nil {
@@ -23,6 +23,19 @@ func NewToken(uid int, expiry int, max_uses int) string {
     }
 	return base64.URLEncoding.EncodeToString(randomBytes)[:TOKEN_LENGTH]
 }
+
+func NewToken(uid int, expiry int64, max_uses int16) (webdb.Token, error) {
+	var tok webdb.Token = webdb.Token{
+		ID: genToken(),
+		User_ID: uid,
+		Expiry: expiry,
+		Max: int16(max_uses),
+		Used: 0,
+	}
+	_, err := webdb.WDB.AddToken(tok)
+	return tok, err
+}
+
 func getCredentials(tQuery string) Credentials {
 		res, err := webdb.WDB.FindToken(tQuery)
 		if err != nil {

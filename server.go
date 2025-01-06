@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
@@ -74,7 +77,6 @@ func get_dir_list(path string) (string, error) {
 	return list, nil
 }
 func main() {
-	// go admin_server()
 	file_server()
 }
 func file_server() {
@@ -123,12 +125,3 @@ func file_server() {
 	})
 	r.Run(":3030")
 }
-// func admin_server() {
-// 	// initialize router
-// 	r := gin.Default()
-
-// 	r.GET("/hello", func(c *gin.Context) {
-// 		c.Status(200)
-// 	})
-// 	r.Run(":4040")
-// }

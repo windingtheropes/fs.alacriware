@@ -181,3 +181,15 @@ func (wd *WebDB) UpdateToken(token Token) (int64, error) {
 	}
 	return rowsUpdated, nil
 }
+
+func (wd *WebDB) AddToken(token Token) (int64, error) {
+	result, err := wd.db.Exec("INSERT INTO token (id, user_id, expiry, max, used) VALUES (?, ?, ?, ?, ?)", token.ID, token.User_ID, token.Expiry, token.Max, token.Used)
+	if err != nil {
+		return 0, fmt.Errorf("add token: %v", err)
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("add token: %v", err)
+	}
+	return id, nil
+}
