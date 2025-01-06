@@ -19,8 +19,9 @@ COPY gobuild.sh ./
 RUN TARGETPLATFORM=$TARGETPLATFORM OUTPUT=/fs-alacriware sh gobuild.sh
 RUN chmod a+x /fs-alacriware
 
-EXPOSE 3030
+EXPOSE 80
 ENV GIN_MODE=release
 ENV PUBDIR="/public"
+ENV WEBPORT=80
 
 CMD ["/fs-alacriware"]

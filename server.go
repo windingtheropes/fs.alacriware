@@ -120,5 +120,11 @@ func file_server() {
 		}
 		c.Status(404)
 	})
-	r.Run(":3030")
+	
+	web_port := os.Getenv("WEBPORT")
+	if web_port == "" {
+		fmt.Println("No value found for WEBPORT.")
+		os.Exit(1)
+	}
+	r.Run(":" + web_port)
 }
