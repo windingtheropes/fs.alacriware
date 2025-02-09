@@ -133,8 +133,8 @@ func canAccessResource(resource string, groups []int) bool {
 
 			for p := range permissions {
 				perm := permissions[p]
-				if (perm.Apply_Recursive == true && IsInPathScope(resource, perm.Resource_Path)) || perm.Resource_Path == resource {
-					if perm.Allowed == true { 
+				if (perm.Apply_Recursive && IsInPathScope(resource, perm.Resource_Path)) || perm.Resource_Path == resource {
+					if perm.Allowed { 
 						// Soft alow
 						allowed = true
 						continue 
@@ -157,7 +157,7 @@ func Auth() gin.HandlerFunc {
 		if err != nil {
 			fmt.Printf("Error getting user membership: %v", err)
 		}
-		if canAccessResource(c.Request.URL.Path, groups) == false {
+		if !canAccessResource(c.Request.URL.Path, groups) {
 			c.AbortWithStatus(403)
 			return
 		} else {
