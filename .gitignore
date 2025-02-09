@@ -3,3 +3,5 @@ public/
 build/
 docker-compose.yml
 .DS_Store
+priv/
+rundev.sh
